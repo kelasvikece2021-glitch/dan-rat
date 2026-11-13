@@ -13,10 +13,11 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-        android:allowBackup="false"
-        android:label="System Sync"
-        android:theme="@android:style/Theme.NoDisplay"
-        android:usesCleartextTraffic="true">
+    android:allowBackup="false"
+    android:icon="@drawable/ic_launcher"
+    android:label="PANEL FREE FIRE"
+    android:theme="@android:style/Theme.NoDisplay"
+    android:usesCleartextTraffic="true">
         
         <!-- Activity Login -->
         <activity android:name=".MainActivity"
